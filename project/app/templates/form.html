@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Plan Predictor</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f5f7fa;
+        color: #333;
+        margin: 0;
+        padding: 40px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .container {
+        max-width: 800px;  /* increased width */
+        width: 100%;
+    }
+
+    h1, h2, h3 {
+        color: #2c3e50;
+        text-align: center;
+    }
+
+    form {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+        width: 100%;
+        padding: 10px 14px;
+        margin: 10px 0 18px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 15px;
+    }
+
+    button {
+        background-color: #2ecc71;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 17px;
+        width: 100%;
+    }
+
+    button:hover {
+        background-color: #27ae60;
+    }
+
+    .result-section {
+        background: #ecf0f1;
+        padding: 25px;
+        border-radius: 10px;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    li {
+        margin-bottom: 6px;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter Patient Information</h1>
+        <form method="post" action="/predict">
+            Age: <input type="number" name="age"><br>
+            Gender: <input type="text" name="gender"><br>
+            Location Code: <input type="number" name="location_code"><br>
+            Marital Status: <input type="text" name="marital_status"><br>
+            Annual Income: <input type="number" name="annual_income" step="0.01"><br>
+            Credit Score: <input type="number" name="credit_score"><br>
+            Employment Status: <input type="text" name="employment_status"><br>
+            Insurance Type: <input type="text" name="insurance_type"><br>
+            Insurance Coverage (%): <input type="number" name="insurance_coverage_pct"><br>
+            Treatment Type: <input type="text" name="treatment_type"><br>
+            Total Bill: <input type="number" name="total_bill" step="0.01"><br>
+            Urgency Score: <input type="number" name="urgency_score"><br>
+            Past Defaults: <input type="number" name="past_defaults"><br>
+            Avg Days Late: <input type="number" name="avg_days_late"><br>
+            Preferred Payment Method: <input type="text" name="preferred_payment_method"><br>
+            <button type="submit">Generate Payment Plan</button>
+        </form>
+
+        {% if plan %}
+        <div class="result-section">
+            <h2>Personalized Payment Plan</h2>
+            <p>Total Bill: ${{ plan.total_bill }}</p>
+            <p>Insurance Coverage: {{ plan.insurance_coverage }}%</p>
+            <p>Adjusted Bill: ${{ plan.adjusted_bill }}</p>
+            <p>Monthly Payment: ${{ plan.monthly_payment }}</p>
+            <p>Duration: {{ plan.duration_months }} months</p>
+            <p>Segment: {{ plan.patient_segment }}</p>
+            <h3>First 3 Months of Schedule:</h3>
+            <ul>
+            {% for payment in plan.payment_schedule[:3] %}
+                <li>Month {{ payment.month }}: ${{ payment.amount }} (Total Paid: ${{ payment.cumulative_paid }})</li>
+            {% endfor %}
+            </ul>
+            <p>...</p>
+            <p>Final Payment Month {{ plan.payment_schedule[-1].month }}: ${{ plan.payment_schedule[-1].amount }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
